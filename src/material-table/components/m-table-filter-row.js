@@ -190,9 +190,11 @@ class MTableFilterRow extends React.Component {
     if (columnDef.field || columnDef.customFilterAndSearch) {
       if (columnDef.filterComponent) {
         return this.renderFilterComponent(columnDef);
-      } else if (columnDef.lookup) {
-        return <this.LookupFilter columnDef={columnDef} />;
-      } else if (columnDef.type === "boolean") {
+      }
+      // else if (columnDef.lookup) {
+      //   return <this.LookupFilter columnDef={columnDef} />;
+      // }
+      else if (columnDef.type === "boolean") {
         return this.renderBooleanFilter(columnDef);
       } else if (["date", "datetime", "time"].includes(columnDef.type)) {
         return this.renderDateTypeFilter(columnDef);
