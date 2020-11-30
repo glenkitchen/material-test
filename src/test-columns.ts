@@ -14,7 +14,7 @@ export const testColumns: Column<object>[] = [
   },
   {
     field: "startDate",
-    title: "Start Date",
+    title: "Date",
     width: 120,
   },
   // {
