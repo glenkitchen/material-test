@@ -1,11 +1,17 @@
 import { Toolbar } from "@material-ui/core";
 import React from "react";
-import { TableSearch, TableTitle } from ".";
+import { ColumnsButton, ExportButton, TableSearch, TableTitle } from ".";
 
 const TableToolbar = (props: any) => {
   const {
+    columns,
+    data,
     dataManager,
+    exportButton,
+    exportCsv,
+    exportPdf,
     localization,
+    onColumnsChanged,
     onSearchChanged,
     title,
     searchAutoFocus,
@@ -23,6 +29,19 @@ const TableToolbar = (props: any) => {
         searchAutoFocus={searchAutoFocus}
         searchFieldVariant={searchFieldVariant}
         searchText={searchText}
+      />
+      <ColumnsButton
+        columns={columns}
+        localization={localization}
+        onColumnsChanged={onColumnsChanged}
+      />
+      <ExportButton
+        columns={columns}
+        data={data}
+        exportButton={exportButton}
+        exportCsv={exportCsv}
+        exportPdf={exportPdf}
+        localization={localization}
       />
     </Toolbar>
   );

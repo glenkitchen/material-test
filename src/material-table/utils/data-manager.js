@@ -329,7 +329,6 @@ export default class DataManager {
       result.destination.droppableId === "headers" &&
       result.source.droppableId === "headers"
     ) {
-      // Get the source and destination index
       const sourceIndex = result.source.index;
       const destIndex = result.destination.index;
 
