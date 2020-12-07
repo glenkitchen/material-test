@@ -7,16 +7,21 @@ const TableToolbar = (props: any) => {
     columns,
     data,
     dataManager,
+    exportAllData,
     exportButton,
     exportCsv,
+    exportDelimiter,
+    exportFileName,
     exportPdf,
+    getFieldValue,
     localization,
     onColumnsChanged,
     onSearchChanged,
-    title,
+    renderData,
     searchAutoFocus,
     searchFieldVariant,
     searchText,
+    title,
   } = props;
 
   return (
@@ -38,10 +43,16 @@ const TableToolbar = (props: any) => {
       <ExportButton
         columns={columns}
         data={data}
+        exportAllData={exportAllData}
         exportButton={exportButton}
         exportCsv={exportCsv}
+        exportDelimiter={exportDelimiter}
+        exportFileName={exportFileName}
         exportPdf={exportPdf}
+        getFieldValue={getFieldValue}
         localization={localization}
+        renderData={renderData}
+        title={title}
       />
     </Toolbar>
   );

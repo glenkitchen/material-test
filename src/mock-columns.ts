@@ -1,6 +1,6 @@
 import { Column } from "./material-table/types";
 
-export const testColumns: Column<object>[] = [
+export const mockColumns: Column<object>[] = [
   // Dates
   {
     field: "year",
@@ -14,7 +14,7 @@ export const testColumns: Column<object>[] = [
   },
   {
     field: "startDate",
-    title: "Date",
+    title: "Start Date",
     width: 120,
   },
   // {
@@ -201,4 +201,11 @@ export const testColumns: Column<object>[] = [
   //   title: "N/a Spend Type",
   //   width: 120,
   // },
+];
+
+export const mockExportColumns: Column<object>[] = [
+  {
+    field: "year",
+    title: "Year",
+  },
 ];

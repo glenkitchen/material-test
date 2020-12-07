@@ -1,4 +1,4 @@
-export const testData: object[] = [
+export const mockData: object[] = [
   {
     promotionId: 119,
     createdBy: "Ashleigh.Stafford@rclfoods.com",

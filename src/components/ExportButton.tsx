@@ -1,89 +1,96 @@
 import { Icon, Menu, MenuItem, Tooltip } from "@material-ui/core";
 import IconButton from "@material-ui/core/IconButton/IconButton";
 import React, { useState } from "react";
+import { defaultExportCsv, defaultExportPdf } from "../utils/export-data";
 
 interface ExportButtonProps {
   columns: any[];
   data: any[];
+  exportAllData: boolean;
   exportButton: any;
   exportCsv: (colums: any[], data: any[]) => {};
+  exportDelimiter: string;
+  exportFileName: string;
   exportPdf: (colums: any[], data: any[]) => {};
+  getFieldValue: (rowData: any, columnDef: any, lookup?: boolean) => {};
   localization: any;
+  renderData: any[];
+  title: string;
 }
 
 const ExportButton: React.FC<ExportButtonProps> = (props) => {
   const {
     columns,
     data,
+    exportAllData,
     exportCsv,
+    exportDelimiter,
+    exportFileName,
     exportPdf,
-    exportButton,
+    getFieldValue,
     localization,
+    renderData,
+    title,
   } = props;
 
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 
-  const defaultExportCsv = () => {
-    // const [columns, data] = this.getTableData();
-    // let fileName = this.props.title || "data";
-    // if (this.props.exportFileName) {
-    //   fileName =
-    //     typeof this.props.exportFileName === "function"
-    //       ? this.props.exportFileName()
-    //       : this.props.exportFileName;
-    // }
-    // const builder = new CsvBuilder(fileName + ".csv");
-    // builder
-    //   .setDelimeter(this.props.exportDelimiter)
-    //   .setColumns(columns.map((columnDef) => columnDef.title))
-    //   .addRows(data)
-    //   .exportFile();
+  const getFileName = () => {
+    return exportFileName || title || "data";
+  };
+  const getColumns = () => {
+    return columns
+      .filter(
+        (columnDef) =>
+          (!columnDef.hidden || columnDef.export === true) &&
+          columnDef.export !== false &&
+          columnDef.field
+      )
+      .sort((a, b) =>
+        a.tableData.columnOrder > b.tableData.columnOrder ? 1 : -1
+      );
   };
 
-  const defaultExportPdf = () => {
-    // if (jsPDF !== null) {
-    //   const [columns, data] = this.getTableData();
-    //   let content = {
-    //     startY: 50,
-    //     head: [columns.map((columnDef) => columnDef.title)],
-    //     body: data,
-    //   };
-    //   const unit = "pt";
-    //   const size = "A4";
-    //   const orientation = "landscape";
-    //   const doc = new jsPDF(orientation, unit, size);
-    //   doc.setFontSize(15);
-    //   doc.text(this.props.exportFileName || this.props.title, 40, 40);
-    //   doc.autoTable(content);
-    //   doc.save(
-    //     (this.props.exportFileName || this.props.title || "data") + ".pdf"
-    //   );
-    // }
+  const getTableData = () => {
+    const exportColumns = getColumns();
+    const exportData = (exportAllData ? data : renderData).map((rowData) =>
+      exportColumns.map((columnDef) => getFieldValue(rowData, columnDef))
+    );
+    return [exportColumns, exportData];
   };
 
-  const handleExportCsv = () => {
+  const onExportCsv = () => {
     if (exportCsv) {
       exportCsv(columns, data);
     } else {
-      defaultExportCsv();
+      const [calculatedColumns, calculatedData] = getTableData();
+      const fileName = getFileName();
+      defaultExportCsv(
+        calculatedColumns,
+        calculatedData,
+        fileName,
+        exportDelimiter
+      );
     }
     setAnchorEl(null);
   };
 
-  const handleExportPdf = () => {
+  const onExportPdf = () => {
     if (exportPdf) {
       exportPdf(columns, props.data);
     } else {
-      defaultExportPdf();
+      const [calculatedColumns, calculatedData] = getTableData();
+      const fileName = getFileName();
+      defaultExportPdf(calculatedColumns, calculatedData, fileName);
     }
     setAnchorEl(null);
   };
 
   return (
     <span>
-      <Tooltip title={localization.exportTitle}>
+      <Tooltip title={localization.exportTitle || "Export"}>
         <IconButton onClick={(event) => setAnchorEl(event.currentTarget)}>
-          <Icon>export</Icon>
+          <Icon>save_alt</Icon>
         </IconButton>
       </Tooltip>
       <Menu
@@ -91,16 +98,12 @@ const ExportButton: React.FC<ExportButtonProps> = (props) => {
         open={Boolean(anchorEl)}
         onClose={() => setAnchorEl(null)}
       >
-        {(exportButton === true || exportButton.csv) && (
-          <MenuItem key="export-csv" onClick={handleExportCsv}>
-            {localization.exportCSVName}
-          </MenuItem>
-        )}
-        {(exportButton === true || exportButton.pdf) && (
-          <MenuItem key="export-pdf" onClick={handleExportPdf}>
-            {localization.exportPDFName}
-          </MenuItem>
-        )}
+        <MenuItem key="export-csv" onClick={onExportCsv}>
+          {localization.exportCSVName || "Export Csv"}
+        </MenuItem>
+        <MenuItem key="export-pdf" onClick={onExportPdf}>
+          {localization.exportPDFName || "Export Pdf"}
+        </MenuItem>
       </Menu>
     </span>
   );

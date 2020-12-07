@@ -329,24 +329,54 @@ export default class DataManager {
       result.destination.droppableId === "headers" &&
       result.source.droppableId === "headers"
     ) {
-      const sourceIndex = result.source.index;
-      const destIndex = result.destination.index;
+      start = Math.min(result.destination.index, result.source.index);
+      const end = Math.max(result.destination.index, result.source.index);
 
-      if (sourceIndex === destIndex) {
-        return;
+      // get the effective start and end considering hidden columns
+      const sorted = [...this.columns]
+        .sort((a, b) => a.tableData.columnOrder - b.tableData.columnOrder)
+        .filter((column) => column.tableData.groupOrder === undefined);
+      let numHiddenBeforeStart = 0;
+      let numVisibleBeforeStart = 0;
+
+      for (
+        let i = 0;
+        i < sorted.length && numVisibleBeforeStart <= start;
+        i++
+      ) {
+        if (sorted[i].hidden) {
+          numHiddenBeforeStart++;
+        } else {
+          numVisibleBeforeStart++;
+        }
+      }
+      const effectiveStart = start + numHiddenBeforeStart;
+
+      let effectiveEnd = effectiveStart;
+      for (
+        let numVisibleInRange = 0;
+        numVisibleInRange < end - start && effectiveEnd < sorted.length;
+        effectiveEnd++
+      ) {
+        if (!sorted[effectiveEnd].hidden) {
+          numVisibleInRange++;
+        }
+      }
+      const colsToMov = sorted.slice(effectiveStart, effectiveEnd + 1);
+
+      if (result.destination.index < result.source.index) {
+        // Take last and add as first
+        const last = colsToMov.pop();
+        colsToMov.unshift(last);
+      } else {
+        // Take first and add as last
+        const last = colsToMov.shift();
+        colsToMov.push(last);
       }
 
-      // Get the source and destination id, where the column order equals the index
-      const sourceId = this.columns.find(
-        (colDef) => colDef.tableData.columnOrder === sourceIndex
-      ).tableData.id;
-      const destId = this.columns.find(
-        (colDef) => colDef.tableData.columnOrder === destIndex
-      ).tableData.id;
-
-      // Set the column order to the opposite index (Mutate)
-      this.columns[sourceId].tableData.columnOrder = destIndex;
-      this.columns[destId].tableData.columnOrder = sourceIndex;
+      for (let i = 0; i < colsToMov.length; i++) {
+        colsToMov[i].tableData.columnOrder = effectiveStart + i;
+      }
 
       return;
     } else {
